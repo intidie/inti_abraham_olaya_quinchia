@@ -1,0 +1,19 @@
+# Entornos virtuales
+.venv/
+venv/
+ENV/
+
+# Archivos de caché de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos de configuración de IDE / Editores
+.vscode/
+.idea/
+.DS_Store
+
+# Archivos temporales y de Quarto
+.quarto/
+*_files/
+*.log
