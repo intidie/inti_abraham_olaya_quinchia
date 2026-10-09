@@ -1,5 +1,7 @@
 # README.md - Taller 1 de Minería de Datos
 # Comparador de Precios en Colombia: Categoría "Afeitado y Depilación"
+#LINK EN STREAMLIT: 
+https://taller1-inti-olaya.streamlit.app/
 
 **Asignatura:** Minería de Datos (Código 2016325)  
 **Institución:** Universidad Nacional de Colombia  
