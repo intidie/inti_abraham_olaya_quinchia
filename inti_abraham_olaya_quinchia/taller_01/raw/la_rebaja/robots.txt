@@ -1,0 +1,127 @@
+User-agent: *
+Disallow: /account/*
+Disallow: /login/*
+Disallow: /checkout/*
+Disallow: /busca/*
+Disallow: /quick-view/*
+Disallow: /espiar/*
+Disallow: /cloxaquim
+
+# OpenAI - ChatGPT
+User-agent: GPTBot
+Disallow: /account/*
+Disallow: /login/*
+Disallow: /checkout/*
+Disallow: /busca/*
+Disallow: /quick-view/*
+Disallow: /espiar/*
+Disallow: /cloxaquim
+Allow: /
+
+User-agent: OAI-SearchBot
+Disallow: /account/*
+Disallow: /login/*
+Disallow: /checkout/*
+Disallow: /busca/*
+Disallow: /quick-view/*
+Disallow: /espiar/*
+Disallow: /cloxaquim
+Allow: /
+
+User-agent: ChatGPT-User
+Disallow: /account/*
+Disallow: /login/*
+Disallow: /checkout/*
+Disallow: /busca/*
+Disallow: /quick-view/*
+Disallow: /espiar/*
+Disallow: /cloxaquim
+Allow: /
+
+# Anthropic - Claude
+User-agent: ClaudeBot
+Disallow: /account/*
+Disallow: /login/*
+Disallow: /checkout/*
+Disallow: /busca/*
+Disallow: /quick-view/*
+Disallow: /espiar/*
+Disallow: /cloxaquim
+Allow: /
+
+User-agent: Claude-SearchBot
+Disallow: /account/*
+Disallow: /login/*
+Disallow: /checkout/*
+Disallow: /busca/*
+Disallow: /quick-view/*
+Disallow: /espiar/*
+Disallow: /cloxaquim
+Allow: /
+
+User-agent: Claude-User
+Disallow: /account/*
+Disallow: /login/*
+Disallow: /checkout/*
+Disallow: /busca/*
+Disallow: /quick-view/*
+Disallow: /espiar/*
+Disallow: /cloxaquim
+Allow: /
+
+# Perplexity AI
+User-agent: PerplexityBot
+Disallow: /account/*
+Disallow: /login/*
+Disallow: /checkout/*
+Disallow: /busca/*
+Disallow: /quick-view/*
+Disallow: /espiar/*
+Disallow: /cloxaquim
+Allow: /
+
+User-agent: Perplexity-User
+Disallow: /account/*
+Disallow: /login/*
+Disallow: /checkout/*
+Disallow: /busca/*
+Disallow: /quick-view/*
+Disallow: /espiar/*
+Disallow: /cloxaquim
+Allow: /
+
+# Google - Gemini y Vertex AI
+User-agent: Google-Extended
+Disallow: /account/*
+Disallow: /login/*
+Disallow: /checkout/*
+Disallow: /busca/*
+Disallow: /quick-view/*
+Disallow: /espiar/*
+Disallow: /cloxaquim
+Allow: /
+
+# Common Crawl
+User-agent: CCBot
+Disallow: /account/*
+Disallow: /login/*
+Disallow: /checkout/*
+Disallow: /busca/*
+Disallow: /quick-view/*
+Disallow: /espiar/*
+Disallow: /cloxaquim
+Allow: /
+
+# Apple Intelligence
+User-agent: Applebot-Extended
+Disallow: /account/*
+Disallow: /login/*
+Disallow: /checkout/*
+Disallow: /busca/*
+Disallow: /quick-view/*
+Disallow: /espiar/*
+Disallow: /cloxaquim
+Allow: /
+
+Sitemap: https://www.larebajavirtual.com/sitemap.xml
+Sitemap: https://blog.larebajavirtual.com/sitemap_index.xml

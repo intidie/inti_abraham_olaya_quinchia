@@ -41,6 +41,7 @@ SCHEMA_VERSION = 2
 # Los comercios son configurables: para cambiar uno basta editar este diccionario.
 COMERCIOS = {
     "La Rebaja": {"slug": "la_rebaja", "base": "https://www.larebajavirtual.com"},
+    "Locatel": {"slug": "locatel", "base": "https://www.locatelcolombia.com"},
     "Olímpica": {"slug": "olimpica", "base": "https://www.olimpica.com"},
     "Éxito": {"slug": "exito", "base": "https://www.exito.com"},
 }
@@ -113,22 +114,58 @@ def _nodos_categoria(arbol, ruta=()):
             yield from _nodos_categoria(n.get("children") or [], r)
 
 
-def _paginar(base, fq):
+RANGOS_PRECIO = [(0, 10000), (10000, 20000), (20000, 40000), (40000, 80000),
+                 (80000, 160000), (160000, 400000), (400000, 100000000)]
+URL_SEARCH = "/api/catalog_system/pub/products/search"
+
+
+def _total(r):
+    m = re.search(r"/(\d+)\s*$", r.headers.get("resources", ""))
+    return int(m.group(1)) if m else None
+
+
+def _paginar_simple(base, fqs, pref):
     desde, total = 0, None
     while desde < MAX_OFFSET:
-        r = _get(base + "/api/catalog_system/pub/products/search",
-                 {"fq": fq, "_from": desde, "_to": desde + PAGINA - 1})
-        m = re.search(r"/(\d+)\s*$", r.headers.get("resources", ""))
-        if m:
-            total = int(m.group(1))
+        r = _get(base + URL_SEARCH, fqs + [("_from", desde), ("_to", desde + PAGINA - 1)])
+        total = _total(r) or total
         datos = r.json()
         if not datos:
             break
-        yield desde // PAGINA + 1, datos, total
+        yield f"{pref}{desde // PAGINA + 1:03d}", datos, total, pref
         if len(datos) < PAGINA:
             break
         desde += PAGINA
         time.sleep(PAUSA_S)
+
+
+def _total_fq(base, fqs):
+    r = _get(base + URL_SEARCH, fqs + [("_from", 0), ("_to", 0)])
+    time.sleep(PAUSA_S)
+    return _total(r) or 0
+
+
+def _dividir(base, fq, a, b):
+    """Parte el rango de precio [a, b] por la mitad hasta que cada trozo tenga <= MAX_OFFSET productos."""
+    fqs = [("fq", fq), ("fq", f"P:[{a} TO {b}]")]
+    tot = _total_fq(base, fqs)
+    if tot == 0:
+        return
+    if tot > MAX_OFFSET and b - a > 1:
+        m = (a + b) // 2
+        yield from _dividir(base, fq, a, m)
+        yield from _dividir(base, fq, m + 1, b)
+    else:
+        yield from _paginar_simple(base, fqs, f"p{a}_{b}_")
+
+
+def _paginar(base, fq):
+    """Devuelve (etiqueta_pagina, datos, total, prefijo). VTEX no pagina más allá de 2500 resultados:
+    si la categoría los supera se divide por rangos de precio (fq=P:[a TO b]) de forma adaptativa."""
+    if _total_fq(base, [("fq", fq)]) > MAX_OFFSET:
+        yield from _dividir(base, fq, 0, 100_000_000)
+    else:
+        yield from _paginar_simple(base, [("fq", fq)], "")
 
 
 def _registros(productos, comercio, base, categoria, ts):
@@ -136,7 +173,10 @@ def _registros(productos, comercio, base, categoria, ts):
     filas = []
     for p in productos:
         for it in p.get("items") or [{}]:
-            vend = (it.get("sellers") or [{}])[0].get("commertialOffer") or {}
+            vendedores = it.get("sellers") or [{}]
+            ofertas = [(v.get("sellerDefault"), v.get("commertialOffer") or {}) for v in vendedores]
+            stock = [o for _, o in sorted(ofertas, key=lambda x: not x[0]) if (o.get("AvailableQuantity") or 0) > 0 and o.get("Price")]
+            vend = stock[0] if stock else ofertas[0][1]
             disp = (vend.get("AvailableQuantity") or 0) > 0
             precio = vend.get("Price")
             lista = vend.get("ListPrice")
@@ -171,20 +211,25 @@ def _scrape_vtex(comercio, modo="online", fecha=None, raw_dir=None, corrida_id=N
         carpeta = os.path.join(raw_dir, cfg["slug"], ts[:10])
         arbol = _get(base + "/api/catalog_system/pub/category/tree/3").json()
         _guardar_gz(os.path.join(carpeta, "arbol_categorias.json.gz"), arbol)
-        cats, filas, esperado, vistos = [], [], 0, set()
+        cats, filas, esperado, vistos, incompletas = [], [], 0, set(), []
         for cat in _nodos_categoria(arbol):
             fq = f"C:/{cat['ruta']}/"
-            total = None
-            for pag, datos, total in _paginar(base, fq):
-                _guardar_gz(os.path.join(carpeta, f"cat_{cat['id']}_pag_{pag:03d}.json.gz"), datos)
+            tot_slices, obtenidos = {}, 0
+            for pag, datos, total, pref in _paginar(base, fq):
+                tot_slices[pref] = total or 0
+                obtenidos += len(datos)
+                _guardar_gz(os.path.join(carpeta, f"cat_{cat['id']}_pag_{pag}.json.gz"), datos)
                 nuevos = [d for d in datos if d.get("productId") not in vistos]
                 vistos.update(d.get("productId") for d in datos)
                 filas += _registros(nuevos, comercio, base, cat["nombre"], ts)
-            cat["total_sitio"] = total
+            total = sum(tot_slices.values()) or None
+            cat["total_sitio"], cat["obtenidos"] = total, obtenidos
+            if total and obtenidos < total:
+                incompletas.append(f"{cat['nombre']}: {obtenidos}/{total}")
             esperado += total or 0
             cats.append(cat)
         meta = {"consulta": ts, "corrida_id": corrida_id, "categorias": cats,
-                "n_esperado": esperado or None, "n_productos": len(vistos)}
+                "n_esperado": esperado or None, "n_productos": len(vistos), "incompletas": incompletas}
         _guardar_gz(os.path.join(carpeta, "meta.json.gz"), meta)
         return filas, meta
     # --- modo offline: reprocesa raw/ sin red ---
@@ -209,6 +254,10 @@ def _scrape_vtex(comercio, modo="online", fecha=None, raw_dir=None, corrida_id=N
 def scrape_la_rebaja(modo="online", fecha=None, raw_dir=None, corrida_id=None):
     return _scrape_vtex("La Rebaja", modo, fecha, raw_dir, corrida_id)
 
+def scrape_locatel(modo="online", fecha=None, raw_dir=None, corrida_id=None):
+    return _scrape_vtex("Locatel", modo, fecha, raw_dir, corrida_id)
+
+
 def scrape_olimpica(modo="online", fecha=None, raw_dir=None, corrida_id=None):
     return _scrape_vtex("Olímpica", modo, fecha, raw_dir, corrida_id)
 
@@ -217,7 +266,30 @@ def scrape_exito(modo="online", fecha=None, raw_dir=None, corrida_id=None):
 
 
 
-SCRAPERS = {"La Rebaja": scrape_la_rebaja, "Olímpica": scrape_olimpica, "Éxito": scrape_exito}
+# Comercios activos (3). Para usar Olímpica, cámbiela por Locatel aquí.
+SCRAPERS = {"La Rebaja": scrape_la_rebaja, "Locatel": scrape_locatel, "Éxito": scrape_exito}
+
+
+def verificar_robots(modo="online", raw_dir=None):
+    """Descarga (o lee de raw/) el robots.txt de cada comercio y verifica si las rutas usadas están permitidas."""
+    from urllib.robotparser import RobotFileParser
+    raw_dir, filas = raw_dir or RAW_DIR, []
+    for nombre, cfg in COMERCIOS.items():
+        if nombre not in SCRAPERS:
+            continue
+        ruta = os.path.join(raw_dir, cfg["slug"], "robots.txt")
+        try:
+            if modo == "online":
+                os.makedirs(os.path.dirname(ruta), exist_ok=True)
+                with open(ruta, "w", encoding="utf-8") as f:
+                    f.write(_get(cfg["base"] + "/robots.txt").text)
+            with open(ruta, encoding="utf-8") as f:
+                rp = RobotFileParser(); rp.parse(f.read().splitlines())
+            ok = [rp.can_fetch("*", cfg["base"] + p) for p in ("/api/catalog_system/pub/category/tree/3", URL_SEARCH + "?fq=C:/1/")]
+            filas.append({"comercio": nombre, "arbol_categorias_permitido": ok[0], "busqueda_productos_permitida": ok[1]})
+        except Exception as e:  # noqa: BLE001
+            filas.append({"comercio": nombre, "arbol_categorias_permitido": None, "busqueda_productos_permitida": None, "nota": str(e)[:80]})
+    return filas
 
 
 # ----------------------------------------------------------------------------
@@ -362,7 +434,7 @@ def _insertar(con, fila, ejec_id):
         motivo_exclusion=excluded.motivo_exclusion, ean=excluded.ean""",
         (cid, fila["sku"], fila["ean"], fila["product_id"], fila["url"], fila["nombre_original"],
          fila["descripcion_original"], fila["texto_original"], fila["marca_original"],
-         fila["categoria_sitio"], marca_std, norm(texto), nombre_base(texto, marca), subcategoria(texto),
+         fila["categoria_sitio"], marca_std, re.sub(r"\bsku\s*\d+\b", "", norm(texto)).strip(), nombre_base(texto, marca), subcategoria(texto),
          cont, unidad, mult, int(bool(exc)),
          f"Fuera de la categoría ({exc.group(0)})" if exc else None))
     aid = con.execute("SELECT id FROM anuncios WHERE comercio_id=? AND sku=?", (cid, fila["sku"])).fetchone()["id"]
@@ -382,7 +454,7 @@ def asignar_correspondencia(con, corrida_id, csv_path=None):
     mismo nombre_base + mismo contenido total y unidad. comparable=1 si el producto está
     presente, con precio, en TODOS los comercios dentro de la misma corrida.
     """
-    n_com = con.execute("SELECT COUNT(*) FROM comercios").fetchone()[0]
+    n_com = con.execute("SELECT COUNT(DISTINCT comercio) FROM ejecuciones WHERE corrida_id=? AND estado!='fallida'", (corrida_id,)).fetchone()[0]
     filas = con.execute("SELECT * FROM anuncios WHERE excluido=0").fetchall()
 
     def tkey(r):
@@ -409,9 +481,16 @@ def asignar_correspondencia(con, corrida_id, csv_path=None):
     salida = []
     for k, rs in grupos.items():
         coms = {r["comercio_id"] for r in rs}
-        comp = int(len(coms) >= 2 and all(
+        comp = int(len(coms) == n_com and all(
             any(r["comercio_id"] == c and r["id"] in con_precio for r in rs) for c in coms))
-        r0 = rs[0]
+        donante = min((r for r in rs if r["contenido_total"]), key=lambda r: len(r["nombre_estandar"]), default=None)
+        if donante and k.startswith("EAN:"):   # mismo EAN = mismo contenido (regla documentada)
+            con.executemany("UPDATE anuncios SET contenido_total=?, unidad_base=? WHERE id=?",
+                            [(donante["contenido_total"], donante["unidad_base"], r["id"])
+                             for r in rs if not r["contenido_total"]])
+        r0 = min(rs, key=lambda r: len(r["nombre_estandar"]))
+        if donante:
+            r0 = dict(r0); r0["contenido_total"], r0["unidad_base"] = donante["contenido_total"], donante["unidad_base"]
         pid = con.execute("""INSERT INTO productos (clave_comun, marca, nombre_estandar, subcategoria,
             contenido_total, unidad_base, n_comercios, comparable) VALUES (?,?,?,?,?,?,?,?)""",
                           (k, r0["marca_estandar"], r0["nombre_estandar"], r0["subcategoria"],
@@ -446,8 +525,8 @@ def ejecutar_recoleccion_completa(modo="online", fecha=None, db_path=None, raw_d
             filas, meta = fn(modo, fecha, raw_dir, corrida)
             cid = meta.get("corrida_id") or (corrida if modo == "online" else "raw-" + meta["consulta"])
             esperado, nprod = meta.get("n_esperado"), meta.get("n_productos")
-            estado = "completa" if filas and (not esperado or nprod >= esperado) else "parcial"
-            detalle = None if estado == "completa" else f"{nprod} productos vs {esperado} en el sitio"
+            estado = "completa" if filas and not meta.get("incompletas") else "parcial"
+            detalle = None if estado == "completa" else f"categorías incompletas: {meta.get('incompletas')}"
         except Exception as e:  # noqa: BLE001
             filas, cid, estado, detalle, esperado, nprod, meta = [], corrida, "fallida", str(e)[:300], None, 0, {}
         con.execute("""INSERT INTO ejecuciones (corrida_id, inicio, comercio, modo, n_registros, n_productos,
@@ -464,6 +543,11 @@ def ejecutar_recoleccion_completa(modo="online", fecha=None, db_path=None, raw_d
         con.commit()
         resumen[nombre] = {"estado": estado, "registros": len(filas), "nuevos": ins, "detalle": detalle}
         print(f"[{nombre}] {estado}: {len(filas)} registros, {ins} observaciones nuevas {detalle or ''}")
+    if modo == "online":
+        try:
+            verificar_robots("online", raw_dir)   # guarda robots.txt en raw/<comercio>/
+        except Exception as e:  # noqa: BLE001
+            print("robots.txt no verificado:", e)
     ult = con.execute("SELECT corrida_id FROM ejecuciones WHERE estado!='fallida' ORDER BY id DESC LIMIT 1").fetchone()
     if ult:
         n = asignar_correspondencia(con, ult[0], os.path.join(os.path.dirname(db_path or DB_PATH), "comparables.csv"))

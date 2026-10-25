@@ -1,0 +1,68 @@
+# ==========================================
+# ROBOTS.TXT - LOCATEL COLOMBIA
+# ==========================================
+
+User-agent: *
+
+# Ãreas del sistema y navegaciÃ³n no indexable
+Disallow: /_secure
+Disallow: /account
+Disallow: /admin
+Disallow: /busca
+Disallow: /buscapagina
+Disallow: /buscavazia
+Disallow: /checkout/
+Disallow: /checkout/cart/add
+Disallow: /coleccion/
+Disallow: /control/
+Disallow: /espiar/
+Disallow: /files/
+Disallow: /lista-de-deseos
+Disallow: /login
+Disallow: /quick-view/
+Disallow: /Sistema/
+Disallow: /wishlist
+Disallow: /search
+
+# URLs de desarrollo / sistema
+Disallow: /_v/
+
+# Bucles y URLs de retorno de login
+Disallow: /*returnUrl=
+
+# ParÃ¡metros o patrones especÃ­ficos sin valor SEO
+Disallow: /*?jml_model=
+Disallow: /*bert-model
+
+# Rangos de precio generados dinÃ¡micamente
+Disallow: /de-100000-a-200000
+Disallow: /de-200000-a-500000
+Disallow: /de-200000-a-300000
+Disallow: /de-2000-a-30000
+Disallow: /de-50000-a-100000
+Disallow: /de-10-a-10000
+
+# Exclusiones especÃ­ficas
+Disallow: /*periogard
+
+# ==========================================
+# GOOGLE
+# ==========================================
+
+User-agent: Googlebot
+Disallow: /*periogard
+Disallow: /*saxenda
+
+User-agent: Googlebot-image
+Disallow: /*periogard
+Disallow: /*saxenda
+
+User-agent: AdsBot-Google
+Disallow: /*periogard
+Disallow: /*saxenda
+
+# ==========================================
+# SITEMAP
+# ==========================================
+
+Sitemap: https://www.locatelcolombia.com/sitemap.xml

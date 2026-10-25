@@ -1,89 +1,73 @@
-# README.md - Taller 1 de Minería de Datos
-# Comparador de Precios en Colombia: Categoría "Afeitado y Depilación"
-# LINK EN STREAMLIT: 
-https://taller1-inti-olaya.streamlit.app/
+# Taller 1 — Comparador de precios: Afeitado y depilación
 
-**Asignatura:** Minería de Datos (Código 2016325)  
-**Institución:** Universidad Nacional de Colombia  
-**Modalidad:** Individual (25% de la nota final)  
-**Categoría Elegida:** 10 - Afeitado y depilación  
+**Asignatura:** Minería de Datos (2016325) · Universidad Nacional de Colombia
+**Estudiante:** Inti Abraham Olaya Quinchia (1000240392)
+**Lenguaje elegido:** Python (extracción, limpieza, SQLite, consultas y gráficos)
 
----
+## Comercios y técnica de extracción
 
-## Descripción del Proyecto
+| Comercio | Técnica |
+|---|---|
+| La Rebaja | `requests` a los servicios JSON de VTEX (árbol de categorías + `products/search`) |
+| Locatel | idem |
+| Éxito | idem |
 
-Este proyecto implementa un comparador de precios automatizado para productos de la categoría **Afeitado y depilación** en tres comercios electrónicos líderes en Colombia: **Farmatodo**, **Cruz Verde** y **Éxito**.
+Sin navegador automatizado. La paginación usa `_from/_to` (50 por página) y el total del sitio se lee del
+encabezado `resources` para verificar la completitud. Pausa de 1 s entre peticiones y *User-Agent* identificado.
 
-El sistema realiza web scraping de las ofertas disponibles, almacena la información estructurada en una base de datos relacional **SQLite** (`comparador_precios.sqlite`), calcula el precio estandarizado por unidad de medida (COP/mL, COP/g, COP/unidad) y evalúa las oportunidades de ahorro para el consumidor final mediante un informe analítico reproducible desarrollado en **Quarto** (`taller_1.qmd`).
-
----
-
-## Estructura del Repositorio
+## Estructura
 
 ```text
-taller-1-mineria-datos/
-├── .gitignore                      # Filtro de archivos excluidos de Git
-├── README.md                       # Documento de instrucciones y guía de uso
-├── requirements.txt                # Dependencias de Python con versiones fijas
-├── scraper.py                      # Módulo independiente de web scraping
-├── comparador_precios.sqlite       # Base de datos relacional SQLite
-├── taller_1.qmd                    # Documento ejecutable en Quarto (Reporte Final)
-└── raw/                            # Almacenamiento local de respuestas crudas (HTML/JSON)
-    ├── farmatodo_afeitado.json
-    ├── cruzverde_afeitado.html
-    └── exito_afeitado.json
+taller_01/
+├── taller_1.qmd                 # informe reproducible (consultas, gráficos, conclusiones)
+├── scraper.py                   # módulo de extracción + limpieza + SQLite + correspondencia
+├── comparador_precios.sqlite    # base generada por el scraper
+├── comparables.csv              # correspondencia de comparables (generada por código)
+├── raw/<comercio>/<fecha>/      # copias crudas (.json.gz) + meta.json.gz
+├── prueba_colab.ipynb           # cuaderno para validar la ejecución en Google Colab
+├── requirements.txt             # dependencias con versiones fijas
+└── app.py                       # app Streamlit auxiliar (opcional)
 ```
 
----
+## Ejecución
 
-## Instrucciones de Ejecución en GitHub Codespaces
-
-### 1. Instalación de Dependencias
-Abre la terminal en GitHub Codespaces y ejecuta:
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Ejecución del Scraper
-El módulo `scraper.py` permite la ejecución en dos modos:
+**En línea** (scraping real; guarda `raw/` y añade observaciones sin sobrescribir):
 
-* **Modo Offline (Predeterminado - Recomendado para evaluación):**  
-  Lee los archivos crudos almacenados en la carpeta `raw/` sin realizar peticiones a la red.
-  ```bash
-  python scraper.py
-  ```
-
-* **Modo Online:**  
-  Realiza peticiones HTTP en vivo a las tiendas web y actualiza los archivos en `raw/`.
-  ```python
-  from scraper import ejecutar_recoleccion
-  ejecutar_recoleccion(modo_offline=False)
-  ```
-
-### 3. Inspección de la Base de Datos SQLite
-Puedes consultar las tablas de la base de datos usando la extensión **SQLite Viewer** en VS Code o desde la terminal de Python/SQLite:
 ```bash
-sqlite3 comparador_precios.sqlite ".tables"
+python scraper.py                  # o: python -c "import scraper; scraper.ejecutar_recoleccion_completa('online')"
 ```
 
-### 4. Compilación del Informe Reproducible (`taller_1.qmd`)
-Para renderizar el informe analítico en formato HTML:
+**Sin conexión** (reprocesa `raw/`; opcional `--fecha AAAA-MM-DD`):
+
 ```bash
-quarto render taller_1.qmd --to html
+python scraper.py --modo offline
 ```
 
----
+**Informe** (requiere [Quarto](https://quarto.org)):
 
-## Estructura de la Base de Datos (`comparador_precios.sqlite`)
+```bash
+quarto render taller_1.qmd --to html      # TALLER_MODO=online para scraping en vivo al renderizar
+quarto render taller_1.qmd --to pdf       # o imprimir el HTML como PDF desde el navegador
+```
 
-La base de datos relacional consta de 4 tablas interconectadas:
-1. `ejecuciones`: Almacena el historial de corridas del scraper, identificando fecha/hora en formato **ISO 8601** (zona horaria de Colombia `UTC-5`) y el modo de ejecución.
-2. `productos`: Catálogo maestro normalizado de marcas y subcategorías.
-3. `anuncios`: Mapeo de URLs, SKUs y el **texto original del anuncio sin modificaciones**.
-4. `observaciones`: Histórico de precios en COP, flags de promoción, precios regulares y marcas de tiempo.
+> Si cambió el esquema respecto a una versión anterior, elimine `comparador_precios.sqlite` y vuelva a ejecutar.
 
----
+## Base de datos
 
-## Autor
-* **Estudiante:** INTI ABRAHAM OLAYA QUINCHIA Taller 1 - Minería de Datos
-* **Universidad:** Universidad Nacional de Colombia
+`comercios`, `ejecuciones` (corrida, inicio, comercio, registros, esperado del sitio, estado),
+`categorias_sitio`, `productos` (id común y `comparable`), `anuncios` (texto original intacto y campos
+estandarizados), `observaciones` (precio, promoción, fecha ISO 8601 -05:00, `UNIQUE(anuncio_id, fecha_consulta)`)
+y la vista `v_obs`. Valores ausentes quedan `NULL`; los agotados no tienen precio.
+
+## Correspondencia de productos
+
+Misma presentación = mismo EAN; si falta, misma marca + nombre base + contenido + unidad. `comparable = 1`
+solo si hay precio en todos los comercios en la misma corrida. Revisar `comparables.csv` a mano.
+
+## Probar fuera del computador personal
+
+Google Colab: `!git clone ...`, `%cd`, `!pip install -r requirements.txt`, `!python scraper.py` y reportar el resultado.
