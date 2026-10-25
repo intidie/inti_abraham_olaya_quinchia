@@ -1,0 +1,237 @@
+---
+title: "Taller 1 — Comparador de precios: Afeitado y depilación"
+subtitle: "Minería de Datos (2016325) · Universidad Nacional de Colombia"
+author: "Inti Abraham Olaya Quinchia (1000240392)"
+lang: es
+format:
+  html: {toc: true, code-fold: true, embed-resources: true}
+  pdf: {toc: true}
+jupyter: python3
+execute: {warning: false}
+---
+
+```{python}
+#| include: false
+import os, sqlite3, pandas as pd, matplotlib.pyplot as plt
+import scraper as sc
+pd.set_option("display.max_colwidth", 60, "display.width", 140)
+ONLINE = os.environ.get("TALLER_MODO", "offline") == "online"   # TALLER_MODO=online para scraping en vivo
+```
+
+# 1. Introducción
+
+Categoría **Afeitado y depilación** (cuchillas, máquinas de afeitar, espumas, geles, ceras,
+cremas depilatorias y productos para después del afeitado). Se compara el precio de al menos
+ocho presentaciones presentes en **tres comercios en línea de Colombia**, elegidos entre los candidatos consultados (La Rebaja, Locatel, Éxito, Olímpica, Jumbo y Carulla) como los tres con mayor cobertura de productos comunes con precio en una misma ejecución,, para identificar
+dónde conviene comprar y qué tamaño tiene el menor precio por unidad de contenido.
+Lenguaje: **Python**. Los precios corresponden al momento de captura y no son permanentes.
+
+# 2. Fuentes y scraping
+
+| Comercio | Técnica | Servicio consultado |
+|---|---|---|
+| Los seis candidatos (todos VTEX) | Peticiones HTTP directas (`requests`) a los servicios JSON de VTEX que usa el propio sitio | `/api/catalog_system/pub/category/tree/3` (descubre las categorías equivalentes) y `/api/catalog_system/pub/products/search?fq=C:/ruta/&_from=&_to=` (50 por página) |
+
+- **Equivalencia de categorías:** se recorre el árbol y se toman los nodos cuyo nombre contiene
+  *afeit, depil, rasur, cuchilla, maquinilla, after shave*; quedan registrados en `categorias_sitio`.
+- **Exclusiones:** `RE_EXCLUIR` descarta productos ajenos a la delimitación (toallas higiénicas,
+  desodorantes, etc.) y guarda el motivo en `anuncios.motivo_exclusion`.
+- **Completitud:** el encabezado `resources: a-b/TOTAL` da el total del sitio; se compara con los productos
+  obtenidos (`ejecuciones.n_productos` vs `n_esperado_sitio`) y el estado queda *completa* o *parcial*.
+- **Buenas prácticas:** pausa de 1 s entre peticiones, reintentos con espera, *User-Agent* identificado.
+  Revisar `robots.txt` de cada sitio antes de ejecutar en vivo.
+- **Copias crudas:** `raw/<comercio>/<AAAA-MM-DD>/*.json.gz`; el modo sin conexión reprocesa esas copias.
+
+- **Cumplimiento (`robots.txt`):** se guarda el `robots.txt` de cada comercio en `raw/` y se verifica con
+  `urllib.robotparser` que las dos rutas consultadas estén permitidas:
+
+```{python}
+pd.DataFrame(sc.verificar_robots("online" if ONLINE else "offline"))
+```
+
+- **Términos de uso:** solo se consultan servicios públicos de catálogo, sin autenticación, a baja frecuencia y con fines
+  académicos; no se redistribuyen los datos.
+
+```{python}
+resumen = sc.ejecutar_recoleccion_completa("online" if ONLINE else "offline")
+pd.DataFrame(resumen).T
+```
+
+# 3. Preparación
+
+`scraper.py` estandariza marca (`marca_estandar`), nombre (`nombre_estandar`, `nombre_base`), subcategoría y
+contenido (`contenido_total` en mL, g, mg o unidad; multipaquetes = contenido × cantidad). El texto original
+no se modifica. **Correspondencia:** misma presentación = mismo EAN; si falta, misma marca + `nombre_base` +
+contenido + unidad. `comparable = 1` solo si el producto tiene precio en los tres comercios en la misma corrida.
+Precios ausentes o agotados quedan en `NULL` (nunca 0).
+
+# 4. Base SQLite
+
+Tablas: `comercios`, `ejecuciones`, `categorias_sitio`, `productos` (id común), `anuncios` (texto original),
+`observaciones` (precio por fecha, `UNIQUE(anuncio_id, fecha_consulta)`) y la vista `v_obs`.
+
+```{python}
+con = sc.conectar()
+def q(sql, p=()):
+    return pd.read_sql_query(sql, con, params=p)
+CORRIDA = con.execute("SELECT corrida_id FROM ejecuciones WHERE estado!='fallida' ORDER BY id DESC LIMIT 1").fetchone()[0]
+print("Corrida analizada:", CORRIDA)
+q("SELECT corrida_id, comercio, inicio, modo, n_registros, n_productos, n_esperado_sitio, estado FROM ejecuciones")
+```
+
+**Comercios usados en el análisis** (la terna con más productos comunes con precio en la misma corrida):
+
+```{python}
+q("SELECT c.nombre AS comercio_en_el_analisis FROM seleccion s JOIN comercios c ON c.id = s.comercio_id")
+```
+
+**Verificación de completitud** (productos obtenidos vs. total que informa cada sitio, por categoría)
+
+```{python}
+q("""SELECT comercio, nombre AS categoria_sitio, total_sitio FROM categorias_sitio WHERE corrida_id=? ORDER BY comercio""", (CORRIDA,))
+```
+
+# 5. Consultas SQL
+
+**P1. Tamaño de la base**
+
+```{python}
+q("""SELECT (SELECT COUNT(*) FROM comercios) comercios,
+ (SELECT COUNT(*) FROM productos) productos_comunes, (SELECT COUNT(*) FROM anuncios) anuncios,
+ (SELECT COUNT(*) FROM observaciones) observaciones""")
+```
+```{python}
+q("SELECT comercio, COUNT(DISTINCT sku) productos FROM v_obs WHERE corrida_id=? GROUP BY comercio", (CORRIDA,))
+```
+
+**P2. ¿≥ 24 observaciones comparables en una misma ejecución? ¿Repetidos?**
+
+```{python}
+q("""SELECT COUNT(*) obs_comparables, COUNT(DISTINCT producto_id) productos, COUNT(DISTINCT comercio) comercios,
+ (COUNT(*) >= 24 AND COUNT(DISTINCT comercio) = 3 AND COUNT(DISTINCT producto_id) >= 8) AS cumple_24 FROM v_obs WHERE corrida_id=? AND comparable=1 AND precio_cop IS NOT NULL""", (CORRIDA,))
+```
+```{python}
+q("""SELECT producto_id, comercio, COUNT(*) n FROM v_obs WHERE corrida_id=? AND comparable=1
+ GROUP BY 1,2 HAVING n>1""", (CORRIDA,))
+```
+
+**P3. Mínimo, máximo, promedio y comercio más barato (con empates)**
+
+```{python}
+P3 = q("""WITH c AS (SELECT producto_id, nombre_estandar, comercio, precio_cop FROM v_obs
+  WHERE corrida_id=? AND comparable=1 AND precio_cop IS NOT NULL),
+ s AS (SELECT producto_id, MIN(precio_cop) pmin, MAX(precio_cop) pmax, ROUND(AVG(precio_cop)) prom FROM c GROUP BY 1)
+SELECT s.producto_id, (SELECT nombre_estandar FROM c WHERE c.producto_id=s.producto_id LIMIT 1) producto,
+ pmin, pmax, prom, (SELECT group_concat(comercio, ' / ') FROM c WHERE c.producto_id=s.producto_id AND c.precio_cop=s.pmin) mas_barato
+FROM s ORDER BY producto_id""", (CORRIDA,))
+P3
+```
+
+**P4 y P6. Ahorro en COP y % (ordenado por ahorro porcentual)**
+
+```{python}
+P4 = q("""WITH c AS (SELECT producto_id, nombre_estandar, precio_cop FROM v_obs
+  WHERE corrida_id=? AND comparable=1 AND precio_cop IS NOT NULL)
+SELECT producto_id, MIN(nombre_estandar) producto, MIN(precio_cop) pmin, MAX(precio_cop) pmax,
+ MAX(precio_cop)-MIN(precio_cop) ahorro_cop, ROUND(100.0*(MAX(precio_cop)-MIN(precio_cop))/MAX(precio_cop),1) ahorro_pct
+FROM c GROUP BY producto_id ORDER BY ahorro_pct DESC""", (CORRIDA,))
+P4
+```
+
+**P5. Menor precio por mL/g/mg/unidad entre tamaños del mismo producto** (no se mezclan unidades)
+
+```{python}
+P5 = q("""SELECT marca_estandar, nombre_base, unidad_base, comercio, contenido_total, precio_cop,
+ ROUND(precio_cop/contenido_total, 2) precio_por_unidad,
+ RANK() OVER (PARTITION BY marca_estandar, nombre_base, unidad_base ORDER BY precio_cop/contenido_total) ranking
+FROM v_obs WHERE corrida_id=? AND excluido=0 AND precio_cop IS NOT NULL AND contenido_total>0
+ AND (marca_estandar, nombre_base, unidad_base) IN (SELECT marca_estandar, nombre_base, unidad_base FROM v_obs
+   WHERE corrida_id=? AND excluido=0 AND contenido_total>0 GROUP BY 1,2,3 HAVING COUNT(DISTINCT contenido_total)>1)
+ORDER BY marca_estandar, nombre_base, unidad_base, ranking""", (CORRIDA, CORRIDA))
+P5.head(30)
+```
+
+**P7. Datos faltantes o inconsistentes**
+
+```{python}
+q("""SELECT COUNT(*) observaciones,
+ SUM(precio_cop IS NULL) sin_precio, SUM(disponible=0) agotados,
+ SUM(marca_estandar IS NULL) sin_marca, SUM(contenido_total IS NULL) sin_contenido,
+ SUM(texto_original IS NULL OR texto_original='') sin_texto, SUM(excluido) excluidos
+FROM v_obs WHERE corrida_id=?""", (CORRIDA,))
+```
+
+**P8. Oferta por comercio y completitud de la ficha**
+
+```{python}
+q("""SELECT comercio, COUNT(DISTINCT sku) productos, SUM(excluido) excluidos,
+ ROUND(100.0*AVG(marca_estandar IS NOT NULL),1) pct_marca,
+ ROUND(100.0*AVG(contenido_total IS NOT NULL),1) pct_contenido,
+ ROUND(100.0*AVG(LENGTH(texto_original)>60),1) pct_descripcion
+FROM v_obs WHERE corrida_id=? GROUP BY comercio""", (CORRIDA,))
+```
+
+```{python}
+def interpretar():
+    if P3.empty:
+        return "No hay productos comparables en la corrida analizada."
+    top = P4.iloc[0]
+    return (f"Se compararon {len(P3)} presentaciones. La mayor diferencia entre comercios está en "
+            f"«{top['producto']}»: {top['ahorro_cop']:,.0f} COP ({top['ahorro_pct']}%). "
+            f"Ahorro promedio: {P4['ahorro_pct'].mean():.1f}%. No se concluye que un comercio sea globalmente más barato.")
+print(interpretar())
+```
+
+# 6. Visualizaciones
+
+```{python}
+#| fig-cap: "Precio (COP) por comercio de las presentaciones comparables"
+D = q("SELECT producto_id, nombre_estandar, comercio, precio_cop FROM v_obs WHERE corrida_id=? AND comparable=1 AND precio_cop IS NOT NULL", (CORRIDA,))
+if not D.empty:
+    W = D.pivot_table(index="producto_id", columns="comercio", values="precio_cop")
+    W.index = [D[D.producto_id == i].nombre_estandar.iloc[0][:35] for i in W.index]
+    W.plot.barh(figsize=(9, max(4, .5 * len(W))), color=dict(zip(W.columns, ["#1b9e77", "#d95f02", "#7570b3", "#e7298a"])))
+    plt.xlabel("Precio (COP)"); plt.tight_layout(); plt.show()
+```
+
+La barra más corta de cada producto indica la oferta más económica; las diferencias se leen en COP.
+*Limitación:* son precios de una sola captura; pueden incluir promociones.
+
+```{python}
+#| fig-cap: "Precio por unidad de contenido (COP/mL, g o unidad) entre tamaños del mismo producto"
+if not P5.empty:
+    for u, g in P5.groupby("unidad_base"):
+        g = g.sort_values("precio_por_unidad").head(15)   # las 15 presentaciones de menor precio por unidad
+        g = g.assign(etq=g.nombre_base.str[:22] + " " + g.contenido_total.astype(int).astype(str) + u + " · " + g.comercio)
+        g.sort_values("precio_por_unidad").plot.barh(x="etq", y="precio_por_unidad", legend=False,
+                                                     figsize=(9, max(3, .35 * len(g))), title=f"COP por {u}")
+        plt.tight_layout(); plt.show()
+```
+
+Solo se comparan presentaciones con la misma unidad base; un tamaño mayor exige mayor desembolso, pero puede
+tener menor precio por unidad.
+
+```{python}
+#| fig-cap: "Oportunidad de ahorro (%) al comprar en el comercio más barato"
+if not P4.empty:
+    P4.sort_values("ahorro_pct").plot.barh(x="producto", y="ahorro_pct", legend=False, figsize=(9, max(4, .45 * len(P4))), color="#1b9e77")
+    plt.xlabel("Ahorro (%) = 100·(Pmax−Pmin)/Pmax"); plt.tight_layout(); plt.show()
+```
+
+# 7. Limitaciones y conclusiones
+
+- **Completitud de Éxito:** su sección «Máquinas de afeitar eléctricas» (~3.600 productos, en su mayoría vendedores externos)
+  supera el tope de 2.500 resultados por consulta de VTEX; se divide por rangos de precio, pero ese filtro no devuelve los
+  productos sin precio (agotados), por lo que `ejecuciones.estado` puede quedar *parcial*. Esos productos no tienen precio y no
+  afectan la comparación.
+- **Disponibilidad:** los productos agotados se guardan con precio `NULL`; solo cuentan como comparables los que tienen
+  precio en los tres comercios en la misma ejecución.
+
+- Los precios reflejan un instante y pueden variar con promociones, ciudad o stock; los agotados se excluyen (NULL).
+- La correspondencia usa EAN o reglas de texto documentadas; revisar `comparables.csv` antes de entregar.
+- **Para el consumidor:** comprar cada presentación en el comercio de la columna `mas_barato` (P3); preferir el
+  tamaño con menor COP/unidad (P5) solo si se consumirá completo, pues exige mayor desembolso inicial.
+
+```{python}
+print(interpretar())
+```
