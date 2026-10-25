@@ -1,22 +1,149 @@
 producto_id,clave_comun,comercio_id,sku,nombre
-5,EAN:8410104274160,1,60220,CREMA VEET DEPILADORA PIEL SENSIBLE SKU154658 | CREMA VEET DEPILADORA PIEL SENSIBLE
-5,EAN:8410104274160,2,48196,Crema Depilatoria Veet Pure Piel Sensible X 200ml | <h3><strong>Crema Depilatoria Veet Pur
-5,EAN:8410104274160,3,3371768,Crema depilatoria VEET piernas & cuerpo piel sensible (200  ml)
-6,EAN:7805010002135,1,18403,CREMA DEPILATORIA VEET BIKINI Y AXILAS SKU147482 | CREMA DEPILATORIA VEET BIKINI Y AXILAS
-6,EAN:7805010002135,2,29768,Crema Depilatoria Axilas y Bikini Veet X 100ML | <p><strong>Crema Depilatoria Axilas y Bik
-6,EAN:7805010002135,3,3026201,Crema depilatoria VEET axilas y bikini (100  ml)
-13,EAN:8410104437749,1,60222,CREMA VEET DEPILADORA PIERNAS CUERPO SKU154659 | CREMA VEET DEPILADORA PIERNAS CUERPO
-13,EAN:8410104437749,2,48197,Crema Depilatoria Veet Pure Piel Normal X 200ml | <h3><strong>Crema Depilatoria Veet Pure 
-13,EAN:8410104437749,3,3371769,Crema depilatoria VEET piernas & cuerpo piel normal (200  ml)
-18,EAN:7506339315899,1,8293,REPUESTO CUCHILLA DE AFEITAR MUJER GILLETTE VENUS BREEZE MAQUINA DE AFEITAR DEPILACION COR
-18,EAN:7506339315899,2,26118,Repuestos de Afeitar Venus Breeze X 2Und | <h3>Repuestos de Afeitar Venus Breeze X 2Und</h
-18,EAN:7506339315899,3,573554,"Repuesto cuchilla de afeitar VENUS ultra comfort breeze (2  und) | <div class=""pdpProductI"
-19,EAN:7502214739552,1,22337,MAQUINA SCHICK QUATTRO WOMEN + 2 RESPUESTOS SKU149720 | MAQUINA SCHICK QUATTRO WOMEN + 2 R
-19,EAN:7502214739552,2,29312,Maquina de Afeitar Recargable Schick Quattro 4 Piel Delicada + 2 repuestos | <h3><strong>M
-19,EAN:7502214739552,3,1566244,Máquina de afeitar SCHICK quattro women + repuestos (1  und)
-20,EAN:4891228580025,1,7617,REPUESTOS SCHICK QUATTRO MUJER SKU109156 | REPUESTOS SCHICK QUATTRO MUJER
-20,EAN:4891228580025,2,2830,Repuesto Máquina Afeitar Schick Women Sensitive X 2 Unidades | <h1>Repuesto Máquina Afeita
-20,EAN:4891228580025,3,395238,Repuesto máquina de afeitar SCHICK quattro for women (2  und)
-58,EAN:7500435188470,1,25366,ESPUMA DE AFEITAR PARA PIEL SENSIBLE GILLETTE SENSITIVE PROTECCION Y MENOS IRRITACION AL A
-58,EAN:7500435188470,2,39001,Espuma De Afeitar Para Piel Sensible Gillette Sensitive X 150g | <h3><strong>Espuma De Afe
-58,EAN:7500435188470,3,3122064,"Espuma de afeitar GILLETTE sensitive (150  gr) | <div class=""pdpProductInfo""><p style=""tex"
+15881,EAN:7805010002135,2,29768,Crema Depilatoria Axilas y Bikini Veet X 100ML | <p><strong>Crema Depilatoria Axilas y Bik
+15881,EAN:7805010002135,3,3026201,Crema depilatoria VEET axilas y bikini (100  ml)
+15881,EAN:7805010002135,5,160223,Crema Veet depilatoria piel sensible con espatula x100ml | Pruebas los mejores productos q
+15886,EAN:8410104274160,2,48196,Crema Depilatoria Veet Pure Piel Sensible X 200ml | <h3><strong>Crema Depilatoria Veet Pur
+15886,EAN:8410104274160,3,3371768,Crema depilatoria VEET piernas & cuerpo piel sensible (200  ml)
+15886,EAN:8410104274160,5,265393,Crema depilatoria Veet para pieles sensibles x200ml | Crema depilatoria Veet para pieles s
+15889,EAN:8410104437749,2,48197,Crema Depilatoria Veet Pure Piel Normal X 200ml | <h3><strong>Crema Depilatoria Veet Pure 
+15889,EAN:8410104437749,3,3371769,Crema depilatoria VEET piernas & cuerpo piel normal (200  ml)
+15889,EAN:8410104437749,5,265392,Crema depilatoria Veet para pieles normales x200ml | Crema depilatoria Veet para pieles no
+15894,EAN:7506339315899,2,26118,Repuestos de Afeitar Venus Breeze X 2Und | <h3>Repuestos de Afeitar Venus Breeze X 2Und</h
+15894,EAN:7506339315899,3,573554,"Repuesto cuchilla de afeitar VENUS ultra comfort breeze (2  und) | <div class=""pdpProductI"
+15894,EAN:7506339315899,5,18051,Repuesto Cuchilla de Afeitar Gillette Venus Ultra Comfort Breeze 2 Uds Repuesto Cuchilla d
+15895,EAN:7502214739552,2,29312,Maquina de Afeitar Recargable Schick Quattro 4 Piel Delicada + 2 repuestos | <h3><strong>M
+15895,EAN:7502214739552,3,1566244,Máquina de afeitar SCHICK quattro women + repuestos (1  und)
+15895,EAN:7502214739552,5,108183,Maquina Schick quattro mujer sensitive + repuesto x2und | Maquina schick quattro mujer sen
+15896,EAN:4891228580025,2,2830,Repuesto Máquina Afeitar Schick Women Sensitive X 2 Unidades | <h1>Repuesto Máquina Afeita
+15896,EAN:4891228580025,3,395238,Repuesto máquina de afeitar SCHICK quattro for women (2  und)
+15896,EAN:4891228580025,5,18049,Repuestos para Máquina de afeitar Schick Quattro Mujer x2 und | Utiliza las máquinas de af
+15903,EAN:7506339315479,2,27912,Maquina de Afeitar Venus Breeze X 1Und | <h3><strong>Maquina de Afeitar Venus Breeze X 1Un
+15903,EAN:7506339315479,3,573259,"Cuchilla de afeitar VENUS ultra comfort breeze (1  und) | <div class=""pdpProductInfo""><p s"
+15903,EAN:7506339315479,5,18047,Cuchilla de Afeitar Gillette Venus Breeze Máquina de Afeitar x1und | ¿Quieres una piel sua
+15905,EAN:7500435225373,2,48671,Maquina De Afeitar Gillette Mach3 Carbono X 1und | <h3><strong>Maquina De Afeitar Gillette
+15905,EAN:7500435225373,3,3359878,"Cuchilla de afeitar MACH 3 gillette carbono (1  und) | <div class=""pdpProductInfo""><p styl"
+15905,EAN:7500435225373,5,260373,Cuchilla de Afeitar con Carbón Gillette Mach 3 Carbono x1und | La nueva máquina de afeitar
+15915,EAN:7500435105699,2,24080,Maquina De Afeitar Desechable Venus Tropical X 3Und | <h3><strong>Maquina De Afeitar Desec
+15915,EAN:7500435105699,3,1173858,"Cuchilla de afeitar VENUS extra suave (3  und) | <div class=""pdpProductInfo""><p style=""tex"
+15915,EAN:7500435105699,5,57322,Cuchilla de Afeitar  Gillette Venus Extra Suave 3 Uds Máquina Afeitar Desechable Gillette 
+15917,EAN:7702018874828,2,4055,Maquinas De Afeitar Desechables Gillette Prestobarba3 X 4Und | <h3><strong>Maquinas De Afe
+15917,EAN:7702018874828,3,638945,"Cuchilla de afeitar PRESTOBARBA 3 gillette (4  und) | <div class=""pdpProductInfo""><p style"
+15917,EAN:7702018874828,5,18060,"Cuchilla de Afeitar Gillette Prestobarba 3, 4 Uds Máquina de afeitar desechable Mujer Gill"
+15919,EAN:7702018874750,2,4054,Maquinas De Afeitar Desechables Gillette Prestobarba3 X 4Und | <h3><strong>Maquinas De Afe
+15919,EAN:7702018874750,3,638731,"Cuchilla de afeitar PRESTOBARBA 3 gillette (4  und) | <div class=""pdpProductInfo""><p style"
+15919,EAN:7702018874750,5,16184,Cuchilla de Afeitar Gillette Prestobarba 3 Máquina de Afeitar  x4und | La máquina de afeit
+15920,EAN:7702018363322,2,25163,Maquina De Afeitar Gillette Mach3 + 2 Repuestos | <h3><strong>Maquina De Afeitar Gillette 
+15920,EAN:7702018363322,3,704450,"Cuchilla de afeitar MACH 3 gillette (2  und) | <div class=""pdpProductInfo""><p style=""text-"
+15920,EAN:7702018363322,5,59112,Gillette Mach 3 Cuchilla de Afeitar Hombre 1 Und + 2 Repuestos | La máquina de afeitar Gil
+15921,EAN:7702018382330,2,25168,Repuestos De Afeitar Gillette Proshield X 2Und | <h3><strong>Repuestos De Afeitar Gillette
+15921,EAN:7702018382330,3,883516,"Repuesto cuchilla de afeitar FUSION gillette proshield (2  und) | <div class=""pdpProductIn"
+15921,EAN:7702018382330,5,38539,Repuestos Cuchilla de Afeitar GILLETTE Proshield 2 Uds Repuestos Cuchilla de Afeitar Gille
+15922,EAN:7702018382354,2,25560,Repuestos De Afeitar Gillette Proshield X 4Und | <h3><strong>Repuestos De Afeitar Gillette
+15922,EAN:7702018382354,3,1189373,"Repuesto cuchilla de afeitar FUSION Gillette Proshield (4  und) | <div class=""pdpProductIn"
+15922,EAN:7702018382354,5,38524,Repuestos Cuchilla de Afeitar Gillette Proshield 4 Und | Los repuestos para la máquina de 
+15923,EAN:7500435141512,2,27545,Maquina De Afeitar Gillette Mach3 AquaGrip + Repuesto X 2Und | <h3><strong>Maquina De Afei
+15923,EAN:7500435141512,3,1581632,"Máquina de afeitar MACH 3 aquagrip recargable (1  und) | <div class=""pdpProductInfo""><p st"
+15923,EAN:7500435141512,5,94979,Máquina de afeitar Gillette Mach3 aquagrip x1und+ repuesto | La máquina de afeitar recarga
+15929,EAN:7702018037865,2,4034,Repuestos De Afeitar Gillette Mach3 Sensitive X 2Und | <h3><strong>Repuestos De Afeitar Gi
+15929,EAN:7702018037865,3,536606,"Repuesto cuchilla de afeitar MACH 3 gillette sensitive (2  und) | <div class=""pdpProductIn"
+15929,EAN:7702018037865,5,16161,Repuestos para Cuchilla de Afeitar GILLETTE Mach 3 Sensitive Piel Sensible 2 Und Repuestos
+15934,EAN:7500435188470,2,39001,Espuma De Afeitar Para Piel Sensible Gillette Sensitive X 150g | <h3><strong>Espuma De Afe
+15934,EAN:7500435188470,3,3122064,"Espuma de afeitar GILLETTE sensitive (150  gr) | <div class=""pdpProductInfo""><p style=""tex"
+15934,EAN:7500435188470,5,188633,Espuma de Afeitar Gillette Sensitive Piel Sensible x155ml | ¡Consigue una afeitada increíb
+15943,EAN:7506460101064,2,55269,Bandas Cera Veet Depilacion Facial Piel Sensible X 16 | <h3><strong>Bandas Cera Veet Depil
+15943,EAN:7506460101064,3,3534006,"Bandas de cera depilatoria VEET Faciales, piel sensible (19  UNIDAD)"
+15943,EAN:7506460101064,5,317060,Bandas Depilatorias Veet Facial Piel Sensible x16 Und | Bandas Depilatorias Veet Facial Pi
+15944,EAN:7500435125567,2,25556,Repuestos de Afeitar Gillette Fusion5 X 2Und | <h3><strong>Repuestos de Afeitar Gillette F
+15944,EAN:7500435125567,3,1456892,"Repuesto cuchilla de afeitar FUSION Gillette 5 (2  und) | <div class=""pdpProductInfo""><p s"
+15944,EAN:7500435125567,5,449384,Repuestos Cuchilla de Afeitar Gillette Fusión 5 2Und | Los repuestos para la máquina de af
+15945,EAN:7502214739026,2,23870,Maquina Afeitar Schick Hydro 5 Hojas X 2Und | <h3><strong>Maquina Afeitar Schick Hydro 5 H
+15945,EAN:7502214739026,3,1145867,Máquina de afeitar SCHICK hydro 5 piel sensible (2  und)
+15945,EAN:7502214739026,5,53089,Máquina para Afeitar Desechables x2 und Schick Hydro 5 hojas | Cambia tu look con esta maq
+15948,EAN:6937266703915,2,42455,Repuesto Maquina Afeitar Schick Intuition Piel Suave X 2Und | <h3><strong>Repuestos Maquin
+15948,EAN:6937266703915,3,166997,"Máquina de afeitar SCHICK intuition sensitive + repuestos (2  und) | <div class=""pdpProduc"
+15948,EAN:6937266703915,5,30380,Repuesto intuition sensitive x 2und | Repuesto intuition sensitive x 2und
+15950,EAN:7506339323153,2,25641,Repuestos De Afeitar Gillette Mach3 Sensitive X 6Und | <p><strong>Repuestos De Afeitar Gil
+15950,EAN:7506339323153,3,574265,"Repuesto cuchilla de afeitar MACH 3 sensitive (6  und) | <div class=""pdpProductInfo""><p st"
+15950,EAN:7506339323153,5,16169,Repuestos para Cuchilla de Afeitar GILLETTE Mach 3 Sensitive Piel Sensible 6 Und Cartuchos
+15952,EAN:8715200813061,2,7485,After Shave Nivea For Men Pos/Sensitive 100Ml | AFTER SHAVE NIVEA FOR MEN POS/SENSITIVE 10
+15952,EAN:8715200813061,3,137087,Bálsamo pos afeitada NIVEA sensitive (100  ml)
+15952,EAN:8715200813061,5,16213,Bálsamo After Shave Nivea Men Sensitive x100ml | Bálsamo After Shave Nivea Men Sensitive x
+15953,EAN:7591066712011,2,3552,Maquina Afeitar Schick Xtreme3 Hawaiian Tropic X 2Und | <h3><strong>Maquina Afeitar Schick
+15953,EAN:7591066712011,3,344501,"Máquina de afeitar SCHICK xtreme3 piel delicada (2  und) | <div class=""pdpProductInfo""><se"
+15953,EAN:7591066712011,5,18058,Máquina Desechable x2 und Xtreme 3 Mujer Hawaiian Tropic | Elimina ya esos vellos indecead
+15954,EAN:4891228530143,2,2823,Maquina de Afeitar Schick Quattro 4 Piel Delicada x 2und | <h3><strong>Maquina de Afeitar 
+15954,EAN:4891228530143,3,756029,"Máquina de afeitar SCHICK quattro for women sensitive (2  und) | <div class=""pdpProductInf"
+15954,EAN:4891228530143,5,18061,Máquina de afeitar Desechable x2 und Quattro Mujer Sensitive x2 | Elimina ya esos vellos i
+15957,EAN:7506460101279,2,55321,Bandas Cera Veet Piel Sensible X 12 | <h3><strong>Bandas Cera Veet Piel Sensible X 12</str
+15957,EAN:7506460101279,3,3534008,Bandas de cera depilatoria VEET piernas & cuerpo (14  UNIDAD)
+15957,EAN:7506460101279,5,317062,Bandas Depilatorias Veet Piernas Cuerpo x12 Und | Bandas Depilatorias Veet Piernas Cuerpo 
+15959,EAN:6937266701478,2,42456,Maquina de Afeitar Recargable Schick Intuition Mujer x 1und | <h3><strong>Maquina de Afeit
+15959,EAN:6937266701478,3,423097,Máquina de afeitar SCHICK intuition sensitive (1  und)
+15959,EAN:6937266701478,5,16152,Máquina de Afeitar para Mujer Schick Intuition x1 und | La maquina de afeitar Schick intui
+15961,EAN:4005900495976,2,25901,Gel De Afeitar Nivea Men Deep Clean Shave X 200Ml | <h3><strong>Gel De Afeitar Nivea Men D
+15961,EAN:4005900495976,3,1571967,"Gel de afeitar NIVEA men deep carbón (200  ml) | <div class=""pdpProductInfo""><p style=""tex"
+15961,EAN:4005900495976,5,95218,Gel para Afeitar Antibacterial Nivea Men Deep Carbón Activo x200ml | El gel para afeitar d
+15962,EAN:7506339323184,2,25167,Repuestos De Afeitar Gillette Mach3 X 6Und | <h3><strong>Repuestos De Afeitar Gillette Mac
+15962,EAN:7506339323184,3,574414,"Repuesto cuchilla de afeitar MACH 3 gillette con 3 hojas  (6  und) | <div class=""pdpProduc"
+15962,EAN:7506339323184,5,16163,Repuestos para Cuchilla de Afeitar Gillette Mach 3 con 3 Hojas x6und | Los repuestos para 
+15963,EAN:7702018330126,2,25162,Recortadora Afeitadora y Perfiladora De Barba Gillette Styler X 1Und | <h3><strong>Recorta
+15963,EAN:7702018330126,3,100958085,"Maquina De Afeitar Gillette Styler 3En1 Original | <span style='color: rgb(102, 102, 102);"
+15963,EAN:7702018330126,3,927418,"Afeitadora GILLETTE eléctrica styler (1  und) | <div class=""pdpProductInfo""><p style=""text"
+15963,EAN:7702018330126,5,37891,Afeitadora Eléctrica Gillette Styler Afeitado Barba y Cuerpo x1und | ¿Quieres darle estilo
+15964,EAN:7500435120920,2,24081,Maquina De Afeitar Venus Spa X 1Und | <h3><strong>Maquina De Afeitar Venus Spa X 1Und</str
+15964,EAN:7500435120920,3,1173862,"Cuchilla de afeitar VENUS ultra comfort spa (1  und) | <div class=""pdpProductInfo""><p styl"
+15964,EAN:7500435120920,5,57179,Cuchilla de Afeitar Mujer Gillette Venus Ultra Comfort Spa 1 Ud Máquina de Afeitar Gillett
+15965,EAN:4891228530129,2,2822,Maquina de Afeitar Schick Quattro Titanium x 2und | <h3><strong>Maquina de Afeitar Schick 
+15965,EAN:4891228530129,3,755958,"Máquina de afeitar SCHICK quattro titanium (2  und) | <div class=""pdpProductInfo""><!--subt"
+15965,EAN:4891228530129,5,16185,Máquina de Afeitar Desechable x2 und Schick Quattro Titanium para Piel Normal | Utiliza la
+15970,EAN:7502214731020,2,60483,Maquina de Afeitar Schick Quattro 4 You X 2Und | <h3><strong>Maquina de Afeitar Schick Qua
+15970,EAN:7502214731020,3,3292996,Máquina de afeitar SCHICK quattro you raspberry rain (2  und)
+15970,EAN:7502214731020,5,224378,Maquina Schick Desechable x2und | Maquina Schick Desechable x2und
+15972,EAN:7500435245852,2,57579,Máquina De Afeitar Gillete Prestobarba 3 Carbón X 2Und | <h3><strong>M&aacute;quina De Afe
+15972,EAN:7500435245852,3,3595238,"Cuchilla de afeitar GILLETTE prestobarba 3 carbono (2  und) | <div class=""pdpProductInfo"">"
+15972,EAN:7500435245852,5,339171,Cuchillas de Afeitar GILLETTE Prestobarba 3 Carbono con Carbón 2 Uds | La nueva máquina pa
+15973,EAN:7506460101088,2,55320,Bandas Cera Veet Axilas Y Bikini X 16 | <h3>Bandas Cera Veet Axilas Y Bikini X 16</h3> <p>
+15973,EAN:7506460101088,3,3534007,Bandas de cera depilatoria VEET axilas & bikini (19  UNIDAD)
+15973,EAN:7506460101088,5,317064,Bandas Depilatorias Veet Axilas Bikini x16 Und | Bandas Depilatorias Veet Axilas Bikini x1
+15975,EAN:7500435219327,2,48779,Repuesto Maquina De Afeitar Gillette Mach3 Carbon X 4und | <h3><strong>Repuesto Maquina De
+15975,EAN:7500435219327,3,3359865,"Repuesto cuchilla de afeitar MACH 3 carbono (4  und) | <div class=""pdpProductInfo""><p styl"
+15975,EAN:7500435219327,5,260374,"Repuestos para Cuchilla de Afeitar  GILLETTE Mach 3 Carbono con 3 Hojas, 4 Und Repuesto pa"
+15982,EAN:7506339337532,2,25555,Maquinas De Afeitar Desechables Gillette Prestobarba3 Sensitive X 4Und | <h3><strong>Maqui
+15982,EAN:7506339337532,3,435769,"Cuchilla de afeitar PRESTOBARBA 3 gillette sensitive (4  und) | <div class=""pdpProductInfo"
+15982,EAN:7506339337532,5,16181,Máquina de afeitar Gillette Prestobarba3 SenseCare Desechables x 4und | Máquina de afeitar
+15983,EAN:7702018363315,2,25553,Maquina De Afeitar Gillette Mach3 Sensitive 1Und + 2 Repuestos | <p>Maquina De Afeitar Gil
+15983,EAN:7702018363315,3,435460,"Máquina de Afeitar MACH 3 Sensitive (2  und) | <div class=""pdpProductInfo""><p style=""text-"
+15983,EAN:7702018363315,5,433968,Maquina Gillette Mach3 Sensitive Aloe | MENOS IRRITACIÓN: con la máquina de afeitar Gillet
+15984,EAN:7500435121002,2,25187,Repuesto Maquina De Afeitar Venus Spa X 2Und | <h3><strong>Repuesto De Afeitar Venus Spa X
+15984,EAN:7500435121002,3,1173865,"Repuesto cuchilla de afeitar VENUS ultra comfort spa (2  und) | <div class=""pdpProductInfo"
+15984,EAN:7500435121002,5,57181,Repuesto Cuchilla de Afeitar Gillette Venus Ultra Comfort Spa 2 Uds Repuesto Cuchilla de A
+15986,EAN:7500435132008,2,25165,Maquina De Afeitar Gillette Fusion5 Recargable X 1Und | <h3><strong>Maquina De Afeitar Gil
+15986,EAN:7500435132008,3,1355846,"Cuchilla de afeitar FUSION 5 gillette  (1  und) | <div class=""pdpProductInfo""><p style=""te"
+15986,EAN:7500435132008,5,215705,Cuchilla de Afeitar Hombre Gillette Fusión 5 1Und | La máquina de afeitar reutilizable Gil
+15988,EAN:7702018037896,2,4035,Repuestos De Afeitar Gillette Mach3 Sensitive X 4Und | <h3><strong>Repuestos De Afeitar Gi
+15988,EAN:7702018037896,3,536607,"Repuesto cuchilla de afeitar MACH 3 gillette sensitive (4  und) | <div class=""pdpProductIn"
+15988,EAN:7702018037896,5,16160,Repuestos para Cuchilla de Afeitar GILLETTE Mach 3 Sensitive Piel Sensible 4Ud Repuestos p
+15989,EAN:7506339337525,2,3377,Gillette Prestobarba Sense Care X 2 Und | <h3><strong>M&aacute;quina de Afeitar Gillette P
+15989,EAN:7506339337525,3,435718,"Máquina De Afeitar Gillette PRESTOBARBA 3 Sensitive Aloe  (2  und) | <div class=""pdpProduc"
+15989,EAN:7506339337525,5,16180,Cuchilla de Afeitar con Aloe Gillette Prestobarba 3 Sensitive x2und | ¿Tienes piel sensibl
+16001,EAN:7500435204040,2,47083,Repuesto Maquina De Afeitar Intima Venus X 2und | <h3><strong>Repuesto Maquina De Afeitar 
+16001,EAN:7500435204040,3,3319284,"Repuesto cuchilla de afeitar VENUS íntima (2  und) | <div class=""pdpProductInfo""><p style="
+16001,EAN:7500435204040,5,246269,Repuestos Cuchilla de Afeitar Mujer GILLETTE Venus Área Íntima 2 Und Repuestos para afeita
+16002,EAN:7500435203975,2,48674,Maquina De Afeitar Intima Venus Intima Desechable X 2und | <h3><strong>Maquina De Afeitar 
+16002,EAN:7500435203975,3,3318307,"Cuchilla de afeitar VENUS íntima (2  und) | <div class=""pdpProductInfo""><p style=""text-ali"
+16002,EAN:7500435203975,5,246277,Cuchilla de Afeitar Mujer GILLETTE Venus Íntima 2Und Cuchilla de Afeitar Gillette Venus ín
+16003,EAN:7500435204026,2,47082,Maquina De Afeitar Intima Venus Recargable X 1und | <h3><strong>Maquina De Afeitar Intima 
+16003,EAN:7500435204026,3,3319285,"Cuchilla de afeitar VENUS íntima (1  und) | <div class=""pdpProductInfo""><p style=""text-ali"
+16003,EAN:7500435204026,5,246275,Cuchilla de Afeitar Gillette Venus área íntima Máquina Afeitar x1und | La nueva máquina de
+16004,EAN:7502214739729,2,47153,Maquina De Afeitar Schick Xtreme 3 Beauty X 2und | <p><strong>Maquina De Afeitar Schick Xt
+16004,EAN:7502214739729,3,1750363,Máquina de afeitar SCHICK xtreme3 beauty (2  und)
+16004,EAN:7502214739729,5,140785,Maquina schick xtreme3 beauty mujer x2 unidades | Maquina schick xtreme3 beauty mujer x2 u
+16005,EAN:7702018072217,2,4037,Maquinas De Afeitar Desechables Gillette Venus Sensitive X 2Und | <h3><strong>Maquinas De 
+16005,EAN:7702018072217,3,143961,"Cuchilla de afeitar VENUS extra suave sensitive (2  und) | <div class=""pdpProductInfo""><p "
+16005,EAN:7702018072217,5,115151,Cuchilla de Afeitar Gillette Venus Extra Suave Sensitive 2 Uds Cuchilla de Afeitar Gillett
+16006,EAN:7707254790550,2,29309,Maquina Afeitar Schick Exacta 2 Delicada X 3Und | <h3><strong>Maquina Afeitar Schick Exact
+16006,EAN:7707254790550,3,937995,Máquina de afeitar SCHICK exacta piel delicada (3  und)
+16006,EAN:7707254790550,5,240176,Maquina schick depilación desechable exacta2 x3und | Maquina schick depilación desechable 
+16009,EAN:7506460101057,2,48195,Kit De Depilacion Veet Pure & Fresh Piel Normal | <h3><strong>Kit De Depilacion Veet Pure 
+16009,EAN:7506460101057,3,3371767,Crema depilatoria VEET facial + crema post depilatoria (50  ml)
+16009,EAN:7506460101057,5,265391,Crema depilatoria Veet kit facial x2und x50ml | Crema depilatoria Veet kit facial x2und x5

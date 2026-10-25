@@ -1,0 +1,85 @@
+# Disallow all crawlers access to certain pages. 
+User-agent: *
+Disallow: /secret 
+Disallow: /*?orderFormId=
+Allow: /*.css
+Allow: /*.jpeg
+Allow: /*.js
+Allow: /*.png
+Allow: /*.webp
+Allow: /*.jpg
+Allow: /*.svg
+Allow: /*.woff
+Allow: /*.gif
+Allow: /*.ico
+
+User-agent: *
+Disallow: /*&
+Disallow: /*%
+
+Sitemap: https://www.olimpica.com/sitemap.xml
+
+User-agent: Googlebot
+Allow: /*
+Disallow: /*?orderFormId=
+Disallow: *?itm_*
+Disallow: /account/*
+Disallow: /login/*
+Disallow: /checkout/*
+Disallow: /busca/*
+Disallow: /quick-view/*
+Disallow: /espiar/*
+Disallow: /buscapagina/*
+Disallow: *?utm*
+Disallow: *productLinkNotFound*
+Disallow: *?msvid*
+Disallow: *?order=OrderBy*
+Disallow: /search?_query=*
+Allow: *?idsku=*
+Allow: *?skuid=*
+Allow: /*?page=
+
+User-agent: Google-Extended
+Allow: /*
+Disallow: /*?orderFormId=
+Disallow: *?itm_*
+Disallow: /img/*
+Disallow: /account/*
+Disallow: /login/*
+Disallow: /checkout/*
+Disallow: /busca/*
+Disallow: /quick-view/*
+Disallow: /espiar/*
+Disallow: /buscapagina/*
+Disallow: *?utm*
+Disallow: *productLinkNotFound*
+Disallow: *?msvid*
+Disallow: *?order=OrderBy*
+Disallow: /search?_query=*
+Allow: *?idsku=*
+Allow: *?skuid=*
+
+User-agent: Googlebot-Image
+Allow: /*
+Disallow: /*?orderFormId=
+Disallow: *?itm_*
+Disallow: /img/*
+Disallow: /account/*
+Disallow: /login/*
+Disallow: /checkout/*
+Disallow: /busca/*
+Disallow: /quick-view/*
+Disallow: /espiar/*
+Disallow: /buscapagina/*
+Disallow: *?utm*
+Disallow: *productLinkNotFound*
+Disallow: *?msvid*
+Disallow: *?order=OrderBy*
+Disallow: /search?_query=*
+
+Disallow: /Site/Servicos.aspx 
+Disallow: /Site/TagsMaisPopulares.aspx 
+Disallow: /Site/QuickView.aspx 
+Disallow: /Site/Produto_Listas.aspx 
+Disallow: /Site/ProdutoFrete.aspx 
+Disallow: /Site/TagDetalhe.aspx

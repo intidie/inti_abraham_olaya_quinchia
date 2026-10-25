@@ -8,11 +8,9 @@
 
 | Comercio | Técnica |
 |---|---|
-| La Rebaja | `requests` a los servicios JSON de VTEX (árbol de categorías + `products/search`) |
-| Locatel | idem |
-| Éxito | idem |
+| Candidatos: La Rebaja, Locatel, Éxito, Olímpica, Jumbo, Carulla | `requests` a los servicios JSON de VTEX (árbol de categorías + `products/search`) |
 
-Sin navegador automatizado. La paginación usa `_from/_to` (50 por página) y el total del sitio se lee del
+Se consultan los seis candidatos (todos VTEX) y el análisis usa automáticamente los **tres** con más productos comunes con precio en la misma corrida (tabla `seleccion`); un sitio que falle queda como ejecución `fallida` sin detener el resto. Sin navegador automatizado. La paginación usa `_from/_to` (50 por página) y el total del sitio se lee del
 encabezado `resources` para verificar la completitud. Pausa de 1 s entre peticiones y *User-Agent* identificado.
 
 ## Estructura
@@ -24,6 +22,7 @@ taller_01/
 ├── comparador_precios.sqlite    # base generada por el scraper
 ├── comparables.csv              # correspondencia de comparables (generada por código)
 ├── raw/<comercio>/<fecha>/      # copias crudas (.json.gz) + meta.json.gz
+├── generar_pdf.py               # genera taller_1.pdf sin Quarto
 ├── prueba_colab.ipynb           # cuaderno para validar la ejecución en Google Colab
 ├── requirements.txt             # dependencias con versiones fijas
 └── app.py                       # app Streamlit auxiliar (opcional)
@@ -38,7 +37,7 @@ pip install -r requirements.txt
 **En línea** (scraping real; guarda `raw/` y añade observaciones sin sobrescribir):
 
 ```bash
-python scraper.py                  # o: python -c "import scraper; scraper.ejecutar_recoleccion_completa('online')"
+python scraper.py                  # consulta los 6 candidatos; o: python -c "import scraper; scraper.ejecutar_recoleccion_completa('online')"
 ```
 
 **Sin conexión** (reprocesa `raw/`; opcional `--fecha AAAA-MM-DD`):
@@ -51,7 +50,7 @@ python scraper.py --modo offline
 
 ```bash
 quarto render taller_1.qmd --to html      # TALLER_MODO=online para scraping en vivo al renderizar
-quarto render taller_1.qmd --to pdf       # o imprimir el HTML como PDF desde el navegador
+python generar_pdf.py                     # PDF sin Quarto (recomendado), o: quarto render taller_1.qmd --to pdf
 ```
 
 > Si cambió el esquema respecto a una versión anterior, elimine `comparador_precios.sqlite` y vuelva a ejecutar.

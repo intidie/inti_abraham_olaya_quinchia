@@ -22,7 +22,7 @@ ONLINE = os.environ.get("TALLER_MODO", "offline") == "online"   # TALLER_MODO=on
 
 Categoría **Afeitado y depilación** (cuchillas, máquinas de afeitar, espumas, geles, ceras,
 cremas depilatorias y productos para después del afeitado). Se compara el precio de al menos
-ocho presentaciones presentes en **La Rebaja, Locatel y Éxito** (Colombia), para identificar
+ocho presentaciones presentes en **tres comercios en línea de Colombia**, elegidos entre los candidatos consultados (La Rebaja, Locatel, Éxito, Olímpica, Jumbo y Carulla) como los tres con mayor cobertura de productos comunes con precio en una misma ejecución,, para identificar
 dónde conviene comprar y qué tamaño tiene el menor precio por unidad de contenido.
 Lenguaje: **Python**. Los precios corresponden al momento de captura y no son permanentes.
 
@@ -30,7 +30,7 @@ Lenguaje: **Python**. Los precios corresponden al momento de captura y no son pe
 
 | Comercio | Técnica | Servicio consultado |
 |---|---|---|
-| La Rebaja, Locatel, Éxito | Peticiones HTTP directas (`requests`) a los servicios JSON de VTEX que usa el propio sitio | `/api/catalog_system/pub/category/tree/3` (descubre las categorías equivalentes) y `/api/catalog_system/pub/products/search?fq=C:/ruta/&_from=&_to=` (50 por página) |
+| Los seis candidatos (todos VTEX) | Peticiones HTTP directas (`requests`) a los servicios JSON de VTEX que usa el propio sitio | `/api/catalog_system/pub/category/tree/3` (descubre las categorías equivalentes) y `/api/catalog_system/pub/products/search?fq=C:/ruta/&_from=&_to=` (50 por página) |
 
 - **Equivalencia de categorías:** se recorre el árbol y se toman los nodos cuyo nombre contiene
   *afeit, depil, rasur, cuchilla, maquinilla, after shave*; quedan registrados en `categorias_sitio`.
@@ -77,6 +77,12 @@ def q(sql, p=()):
 CORRIDA = con.execute("SELECT corrida_id FROM ejecuciones WHERE estado!='fallida' ORDER BY id DESC LIMIT 1").fetchone()[0]
 print("Corrida analizada:", CORRIDA)
 q("SELECT corrida_id, comercio, inicio, modo, n_registros, n_productos, n_esperado_sitio, estado FROM ejecuciones")
+```
+
+**Comercios usados en el análisis** (la terna con más productos comunes con precio en la misma corrida):
+
+```{python}
+q("SELECT c.nombre AS comercio_en_el_analisis FROM seleccion s JOIN comercios c ON c.id = s.comercio_id")
 ```
 
 **Verificación de completitud** (productos obtenidos vs. total que informa cada sitio, por categoría)
@@ -213,6 +219,13 @@ if not P4.empty:
 ```
 
 # 7. Limitaciones y conclusiones
+
+- **Completitud de Éxito:** su sección «Máquinas de afeitar eléctricas» (~3.600 productos, en su mayoría vendedores externos)
+  supera el tope de 2.500 resultados por consulta de VTEX; se divide por rangos de precio, pero ese filtro no devuelve los
+  productos sin precio (agotados), por lo que `ejecuciones.estado` puede quedar *parcial*. Esos productos no tienen precio y no
+  afectan la comparación.
+- **Disponibilidad:** los productos agotados se guardan con precio `NULL`; solo cuentan como comparables los que tienen
+  precio en los tres comercios en la misma ejecución.
 
 - Los precios reflejan un instante y pueden variar con promociones, ciudad o stock; los agotados se excluyen (NULL).
 - La correspondencia usa EAN o reglas de texto documentadas; revisar `comparables.csv` antes de entregar.

@@ -17,6 +17,7 @@ Uso:
 import argparse
 import csv
 import glob
+from itertools import combinations
 import gzip
 import json
 import os
@@ -43,6 +44,8 @@ COMERCIOS = {
     "La Rebaja": {"slug": "la_rebaja", "base": "https://www.larebajavirtual.com"},
     "Locatel": {"slug": "locatel", "base": "https://www.locatelcolombia.com"},
     "Olímpica": {"slug": "olimpica", "base": "https://www.olimpica.com"},
+    "Jumbo": {"slug": "jumbo", "base": "https://www.jumbocolombia.com"},
+    "Carulla": {"slug": "carulla", "base": "https://www.carulla.com"},
     "Éxito": {"slug": "exito", "base": "https://www.exito.com"},
 }
 
@@ -233,7 +236,7 @@ def _scrape_vtex(comercio, modo="online", fecha=None, raw_dir=None, corrida_id=N
         _guardar_gz(os.path.join(carpeta, "meta.json.gz"), meta)
         return filas, meta
     # --- modo offline: reprocesa raw/ sin red ---
-    carpetas = sorted(glob.glob(os.path.join(raw_dir, cfg["slug"], "*")))
+    carpetas = sorted(c for c in glob.glob(os.path.join(raw_dir, cfg["slug"], "*")) if os.path.isdir(c))   # solo carpetas de fecha (no robots.txt)
     if fecha:
         carpetas = [c for c in carpetas if os.path.basename(c) == fecha]
     if not carpetas:
@@ -258,6 +261,14 @@ def scrape_locatel(modo="online", fecha=None, raw_dir=None, corrida_id=None):
     return _scrape_vtex("Locatel", modo, fecha, raw_dir, corrida_id)
 
 
+def scrape_jumbo(modo="online", fecha=None, raw_dir=None, corrida_id=None):
+    return _scrape_vtex("Jumbo", modo, fecha, raw_dir, corrida_id)
+
+
+def scrape_carulla(modo="online", fecha=None, raw_dir=None, corrida_id=None):
+    return _scrape_vtex("Carulla", modo, fecha, raw_dir, corrida_id)
+
+
 def scrape_olimpica(modo="online", fecha=None, raw_dir=None, corrida_id=None):
     return _scrape_vtex("Olímpica", modo, fecha, raw_dir, corrida_id)
 
@@ -266,8 +277,13 @@ def scrape_exito(modo="online", fecha=None, raw_dir=None, corrida_id=None):
 
 
 
-# Comercios activos (3). Para usar Olímpica, cámbiela por Locatel aquí.
-SCRAPERS = {"La Rebaja": scrape_la_rebaja, "Locatel": scrape_locatel, "Éxito": scrape_exito}
+# Comercios candidatos (todos VTEX). Se consultan todos y el análisis usa los 3 con mayor número de
+# productos comunes con precio en una misma corrida (ver asignar_correspondencia). Si un sitio
+# falla o bloquea, su ejecución queda "fallida" y se descarta sin detener el resto.
+# Grupo empresarial: Éxito y Carulla comparten catálogo, SKU y precios (Grupo Éxito); no son comercios independientes.
+GRUPO = {"Éxito": "Grupo Éxito", "Carulla": "Grupo Éxito", "Jumbo": "Cencosud"}
+SCRAPERS = {"La Rebaja": scrape_la_rebaja, "Locatel": scrape_locatel, "Éxito": scrape_exito,
+            "Olímpica": scrape_olimpica, "Jumbo": scrape_jumbo, "Carulla": scrape_carulla}
 
 
 def verificar_robots(modo="online", raw_dir=None):
@@ -386,12 +402,15 @@ CREATE TABLE IF NOT EXISTS observaciones (
   ejecucion_id INTEGER NOT NULL REFERENCES ejecuciones(id),
   precio_cop REAL, precio_regular_cop REAL, en_promocion INTEGER NOT NULL, disponible INTEGER NOT NULL,
   fecha_consulta TEXT NOT NULL, UNIQUE (anuncio_id, fecha_consulta));
-CREATE VIEW IF NOT EXISTS v_obs AS
+CREATE TABLE IF NOT EXISTS seleccion (        -- comercios usados en el análisis
+  comercio_id INTEGER PRIMARY KEY REFERENCES comercios(id));
+DROP VIEW IF EXISTS v_obs;
+CREATE VIEW v_obs AS
 SELECT e.corrida_id, c.nombre AS comercio, o.fecha_consulta, o.precio_cop, o.precio_regular_cop,
        o.en_promocion, o.disponible, a.id AS anuncio_id, a.sku, a.url, a.texto_original,
        a.marca_estandar, a.nombre_estandar, a.nombre_base, a.subcategoria, a.contenido_total,
        a.unidad_base, a.excluido, a.motivo_exclusion, p.id AS producto_id, p.clave_comun,
-       COALESCE(p.comparable, 0) AS comparable
+       CASE WHEN p.comparable = 1 AND a.comercio_id IN (SELECT comercio_id FROM seleccion) THEN 1 ELSE 0 END AS comparable
 FROM observaciones o JOIN ejecuciones e ON e.id = o.ejecucion_id
 JOIN anuncios a ON a.id = o.anuncio_id JOIN comercios c ON c.id = a.comercio_id
 LEFT JOIN productos p ON p.id = a.producto_id;
@@ -451,10 +470,10 @@ def _insertar(con, fila, ejec_id):
 def asignar_correspondencia(con, corrida_id, csv_path=None):
     """
     Regla documentada: misma presentación = mismo EAN; si falta el EAN, misma marca +
-    mismo nombre_base + mismo contenido total y unidad. comparable=1 si el producto está
-    presente, con precio, en TODOS los comercios dentro de la misma corrida.
+    mismo nombre_base + mismo contenido total y unidad. Entre los comercios de la corrida se
+    elige la terna con más productos presentes, con precio, en los tres (tabla seleccion);
+    comparable=1 para esos productos.
     """
-    n_com = con.execute("SELECT COUNT(DISTINCT comercio) FROM ejecuciones WHERE corrida_id=? AND estado!='fallida'", (corrida_id,)).fetchone()[0]
     filas = con.execute("SELECT * FROM anuncios WHERE excluido=0").fetchall()
 
     def tkey(r):
@@ -479,10 +498,19 @@ def asignar_correspondencia(con, corrida_id, csv_path=None):
     con_precio = {r["anuncio_id"] for r in con.execute(
         "SELECT anuncio_id FROM v_obs WHERE corrida_id=? AND precio_cop IS NOT NULL", (corrida_id,))}
     salida = []
+    ids_run = [r[0] for r in con.execute(
+        """SELECT DISTINCT c.id FROM ejecuciones e JOIN comercios c ON c.nombre=e.comercio
+           WHERE e.corrida_id=? AND e.estado!='fallida' ORDER BY c.id""", (corrida_id,))]
+    con_precio_g = {k: {r["comercio_id"] for r in rs if r["id"] in con_precio} for k, rs in grupos.items()}
+    nom = {r[0]: r[1] for r in con.execute("SELECT id, nombre FROM comercios")}
+    indep = lambda cb: len({GRUPO.get(nom[i], nom[i]) for i in cb}) == len(cb)   # un comercio por grupo
+    mejor = max((cb for cb in combinations(ids_run, min(3, len(ids_run))) if indep(cb)) or [()],
+                key=lambda cb: sum(set(cb) <= s for s in con_precio_g.values()), default=())
+    con.execute("DELETE FROM seleccion")
+    con.executemany("INSERT INTO seleccion VALUES (?)", [(i,) for i in mejor])
     for k, rs in grupos.items():
         coms = {r["comercio_id"] for r in rs}
-        comp = int(len(coms) == n_com and all(
-            any(r["comercio_id"] == c and r["id"] in con_precio for r in rs) for c in coms))
+        comp = int(bool(mejor) and set(mejor) <= con_precio_g[k])
         donante = min((r for r in rs if r["contenido_total"]), key=lambda r: len(r["nombre_estandar"]), default=None)
         if donante and k.startswith("EAN:"):   # mismo EAN = mismo contenido (regla documentada)
             con.executemany("UPDATE anuncios SET contenido_total=?, unidad_base=? WHERE id=?",
@@ -497,7 +525,7 @@ def asignar_correspondencia(con, corrida_id, csv_path=None):
                            r0["contenido_total"], r0["unidad_base"], len(coms), comp)).lastrowid
         con.executemany("UPDATE anuncios SET producto_id=? WHERE id=?", [(pid, r["id"]) for r in rs])
         if comp:
-            salida += [(pid, k, r["comercio_id"], r["sku"], r["texto_original"][:90]) for r in rs]
+            salida += [(pid, k, r["comercio_id"], r["sku"], r["texto_original"][:90]) for r in rs if r["comercio_id"] in mejor]
     con.commit()
     if csv_path is not None:
         with open(csv_path, "w", newline="", encoding="utf-8") as f:
@@ -551,7 +579,11 @@ def ejecutar_recoleccion_completa(modo="online", fecha=None, db_path=None, raw_d
     ult = con.execute("SELECT corrida_id FROM ejecuciones WHERE estado!='fallida' ORDER BY id DESC LIMIT 1").fetchone()
     if ult:
         n = asignar_correspondencia(con, ult[0], os.path.join(os.path.dirname(db_path or DB_PATH), "comparables.csv"))
-        print(f"Correspondencia: {n} productos comunes/únicos agrupados; ver tabla productos.")
+        sel = [r[0] for r in con.execute("SELECT c.nombre FROM seleccion s JOIN comercios c ON c.id=s.comercio_id")]
+        nc = con.execute("SELECT COUNT(*) FROM productos WHERE comparable=1").fetchone()[0]
+        print(f"Comercios en el análisis: {sel}. Productos comparables: {nc} ({nc * len(sel)} observaciones).")
+        print("CUMPLE el mínimo (>=8 productos x 3 comercios)." if nc >= 8 and len(sel) == 3 else
+              "ATENCIÓN: NO cumple el mínimo de 8 comparables en 3 comercios.")
     con.close()
     return resumen
 
@@ -560,5 +592,6 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--modo", choices=["online", "offline"], default="online")
     ap.add_argument("--fecha", help="AAAA-MM-DD de la copia cruda (solo offline)")
+    ap.add_argument("--comercios", nargs="*", help="subconjunto de comercios (por defecto todos los candidatos)")
     a = ap.parse_args()
-    ejecutar_recoleccion_completa(a.modo, a.fecha)
+    ejecutar_recoleccion_completa(a.modo, a.fecha, comercios=a.comercios)

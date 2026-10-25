@@ -1,0 +1,63 @@
+User-agent: *
+ Allow: /*.css
+Allow: /*.jpeg
+Allow: /*.js
+Allow: /*.png
+Allow: /*.webp
+Allow: /*.jpg
+Allow: /*.svg
+Allow: /*.woff
+Allow: /*.gif
+Allow: /*.ico
+
+Disallow: /Account*
+Disallow: /account*
+Disallow: /CallCenter/
+Disallow: /CEM/
+Disallow: /busca*
+Disallow: /checkout/
+Disallow: /Site/TagDetalhe.aspx
+Disallow: /quick-view/
+Disallow: /no-usar*
+Disallow: /cencosud
+Disallow: /sistema
+Disallow: /carrefour
+Disallow: /login*
+Disallow: /cart
+# Disallow URL Parameters 
+
+Disallow: /?*OrderByRelease
+Disallow: /?*OrderByScore
+Disallow: /?*q
+Disallow: /?*PS
+Disallow: /?*map
+Disallow: /?*idproduto
+Disallow: /?*KeepThis
+Disallow: /?*TB_iframe
+Disallow: /?*fq
+Disallow: /?*cc
+Disallow: /?*ciudad
+Disallow: /?*PageNumber
+Disallow: /?*sm
+Disallow: /?*IdImagen
+Disallow: /?*IdTipo
+Disallow: /?*Tamano
+Disallow: /?*TabId
+Disallow: /?*checkout
+Disallow: /?*ft
+Disallow: /?*iframe
+Disallow: /?*page
+Disallow: /?*PaginaAtual
+Disallow: /?*productId
+Disallow: /?*productLinkId
+Disallow: /?*ProductLinkNotFound
+Disallow: /?*ReturnUrl
+Disallow: /?*slash
+Disallow: /?*SortOrder
+Disallow: /garantia-extendida-*
+Disallow: /*?*garantia-extendida=
+Disallow: /*/MetaPixel
+
+
+sitemap: https://www.jumbocolombia.com/sitemap.xml
+sitemap: https://www.jumbocolombia.com/sitemap/sitemap-custom.xml
